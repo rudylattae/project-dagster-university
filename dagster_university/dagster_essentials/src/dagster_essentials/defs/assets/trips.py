@@ -37,7 +37,7 @@ def taxi_zones_file() -> None:
     deps=[taxi_trips_file],
 )
 def taxi_trips() -> None:
-    """A DuckDB table containing the rawtaxi trips data."""
+    """A DuckDB table containing the raw taxi trips data."""
     month_to_fetch = '2023-03'
     raw_file_path = constants.TAXI_TRIPS_TEMPLATE_FILE_PATH.format(month_to_fetch)
     query = f"""
@@ -56,6 +56,33 @@ def taxi_trips() -> None:
     """
 
     dg.get_dagster_logger().info(f'Loading raw data from {raw_file_path} into DuckDB table taxi_trips')
+
+    conn = backoff(
+        fn=duckdb.connect,
+        retry_on=(RuntimeError, duckdb.IOException),
+        kwargs={'database': os.getenv('DUCKDB_DATABASE')},
+        max_retries=10,
+    )
+    conn.execute(query)
+
+
+@dg.asset(
+    deps=[taxi_zones_file],
+)
+def taxi_zones() -> None:
+    """A DuckDB table containing the taxi zones data."""
+    query = f"""
+        CREATE OR REPLACE TABLE taxi_zones AS (
+            SELECT
+                LocationID AS zone_id,
+                zone,
+                borough,
+                the_geom AS geometry
+            FROM '{constants.TAXI_ZONES_FILE_PATH}'
+        );
+    """
+
+    dg.get_dagster_logger().info(f'Loading taxi zones data from {constants.TAXI_ZONES_FILE_PATH} into DuckDB table taxi_zones')
 
     conn = backoff(
         fn=duckdb.connect,

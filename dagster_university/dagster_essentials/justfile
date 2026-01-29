@@ -1,3 +1,6 @@
+set dotenv-load 
+duckdb_database := env("DUCKDB_DATABASE")
+
 _default:
     @just --list --unsorted
 
@@ -16,3 +19,19 @@ start:
 # Materialize an asset
 @materialize +args:
     uv run dg launch --assets {{args}}
+
+# Show tables in DuckDB
+show-tables:
+    #!/usr/bin/env -S uv run --script
+    import duckdb
+    conn = duckdb.connect(database="{{duckdb_database}}")
+    reesults = conn.execute("SHOW TABLES;").fetchall()
+    print(reesults)
+
+# Verify table has data
+verify-table +table_name:
+    #!/usr/bin/env -S uv run --script
+    import duckdb
+    conn = duckdb.connect(database="{{duckdb_database}}")
+    reesults = conn.execute("SELECT count(*) FROM {{table_name}};").fetchall()
+    print(reesults)

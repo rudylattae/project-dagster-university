@@ -9,6 +9,10 @@ start:
 @check:
     uv run dg check defs
 
+# Scaffold a Dagster entity. E.g. scaffold defs dagster.asset/trips.py
+@scaffold *args:
+    uv run dg scaffold {{args}}
+
 # Materialize an asset
 @materialize +args:
     uv run dg launch --assets {{args}}

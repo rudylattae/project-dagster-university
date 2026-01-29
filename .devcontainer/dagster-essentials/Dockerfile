@@ -11,5 +11,5 @@ RUN uv pip install -r pyproject.toml --system
 # Install Just command runner and related bash completions
 RUN <<EOT
     curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --tag 1.42.2 --to /bin
-    echo 'eval "$(just --completions bash)"' >> ~/.bashrc
+    echo 'eval "$(just --completions bash)"' >> ~/.bash_aliases
 EOT

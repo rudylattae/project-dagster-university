@@ -1,0 +1,10 @@
+_default:
+    @just --list --unsorted
+
+# Start the Dagster dev server
+start:
+    uv run dg dev
+
+# Check Dagster definitions
+@check:
+    uv run dg check defs

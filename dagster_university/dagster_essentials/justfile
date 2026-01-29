@@ -8,3 +8,7 @@ start:
 # Check Dagster definitions
 @check:
     uv run dg check defs
+
+# Materialize an asset
+@materialize +args:
+    uv run dg launch --assets {{args}}
